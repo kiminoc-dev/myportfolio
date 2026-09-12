@@ -1,0 +1,143 @@
+import React, { useState, useLayoutEffect } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+
+const SharedImageTransition = () => {
+  const { scrollY } = useScroll();
+
+  const [rects, setRects] = useState({
+    hero: null,
+    about: null,
+    container: null
+  });
+
+  useLayoutEffect(() => {
+    const updateRects = () => {
+      const heroImg = document.getElementById('hero-image');
+      const aboutImg = document.getElementById('about-image');
+      const aboutSection = document.getElementById('about');
+
+      if (heroImg && aboutImg && aboutSection) {
+        const heroRect = heroImg.getBoundingClientRect();
+        const aboutRect = aboutImg.getBoundingClientRect();
+        const aboutSectionRect = aboutSection.getBoundingClientRect();
+
+        setRects({
+          hero: {
+            top: heroRect.top,
+            left: heroRect.left,
+            width: heroRect.width,
+            height: heroRect.height,
+            borderRadius: '50%',
+          },
+          about: {
+            top: aboutRect.top + window.scrollY,
+            left: aboutRect.left + window.scrollX,
+            width: aboutRect.width,
+            height: aboutRect.height,
+            borderRadius: '24px',
+          },
+          container: {
+            top: aboutSectionRect.top + window.scrollY,
+            height: aboutSectionRect.height
+          }
+        });
+      }
+    };
+
+    updateRects();
+    window.addEventListener('resize', updateRects);
+    return () => window.removeEventListener('resize', updateRects);
+  }, []);
+
+  const hLeft = rects.hero?.left || 0;
+  const hTop = rects.hero?.top || 0;
+  const hW = rects.hero?.width || 0;
+  const hH = rects.hero?.height || 0;
+  const aLeft = rects.about?.left || 0;
+  const aTop = rects.about?.top || 0;
+  const aW = rects.about?.width || 0;
+  const aH = rects.about?.height || 0;
+  const cTop = rects.container?.top || 0;
+
+  const startScroll = cTop - window.innerHeight * 0.8;
+  const endScroll = aTop - aH / 2;
+
+  const x = useTransform(
+    scrollY,
+    [startScroll, (startScroll + endScroll) / 2, endScroll],
+    [hLeft, (hLeft + aLeft) / 2 - 100, aLeft]
+  );
+
+  const y = useTransform(
+    scrollY,
+    [startScroll, endScroll],
+    [hTop, (val) => aTop - val]
+  );
+
+  const width = useTransform(
+    scrollY,
+    [startScroll, endScroll],
+    [hW, aW]
+  );
+
+  const height = useTransform(
+    scrollY,
+    [startScroll, endScroll],
+    [hH, aH]
+  );
+
+  const borderRadius = useTransform(
+    scrollY,
+    [startScroll, endScroll],
+    ['50%', '24px']
+  );
+
+  const opacity = useTransform(
+    scrollY,
+    [startScroll - 100, startScroll, endScroll, endScroll + 100],
+    [0, 1, 1, 0]
+  );
+
+  const rotate = useTransform(
+    scrollY,
+    [startScroll, (startScroll + endScroll) / 2, endScroll],
+    [0, 2, 0]
+  );
+
+  const springConfig = { damping: 25, stiffness: 120 };
+  const smoothX = useSpring(x, springConfig);
+  const smoothY = useSpring(y, springConfig);
+  const smoothW = useSpring(width, springConfig);
+  const smoothH = useSpring(height, springConfig);
+  const smoothR = useSpring(borderRadius, springConfig);
+
+  if (!rects.hero || !rects.about) return null;
+
+  return (
+    <motion.div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        x: smoothX,
+        y: smoothY,
+        width: smoothW,
+        height: smoothH,
+        borderRadius: smoothR,
+        opacity: opacity,
+        zIndex: 9999,
+        pointerEvents: 'none',
+        rotate: rotate,
+      }}
+      className="overflow-hidden shadow-2xl border-4 border-white/10"
+    >
+      <img
+        src="/Images/Logo/aboutmelogo.jpg"
+        alt="Kim Joseph Inoc"
+        className="w-full h-full object-cover"
+      />
+    </motion.div>
+  );
+};
+
+export default SharedImageTransition;
