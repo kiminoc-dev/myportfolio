@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import Magnetic from './Magnetic';
 
 const About = () => {
   return (
@@ -70,8 +71,8 @@ const About = () => {
 
             <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-6">
               {[
-                { label: 'Degree', value: 'BS in IT' },
-                { label: 'Focus', value: 'Systems Design' },
+                { label: 'Degree', value: 'BSIT' },
+                { label: 'Focus', value: 'Web Design / Dev' },
                 { label: 'Exp', value: 'Technical VA' },
               ].map((stat) => (
                 <div key={stat.label} className="p-4 rounded-2xl bg-white/5 border border-white/10">
@@ -79,6 +80,64 @@ const About = () => {
                   <div className="text-text-primary font-bold text-lg">{stat.value}</div>
                 </div>
               ))}
+            </div>
+
+            {/* CV Action Buttons */}
+            <div className="mt-10 flex flex-wrap justify-center lg:justify-start gap-4">
+              <Magnetic>
+                <a
+                  href="/Kim_Joseph_Inoc_VA_Resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="interactive px-8 py-4 bg-accent-blue text-white font-bold rounded-full hover:bg-blue-600 transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-accent-blue/25 inline-flex items-center gap-3 text-base"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                  View CV
+                </a>
+              </Magnetic>
+
+              <Magnetic>
+                <a
+                  href="/Kim_Joseph_Inoc_VA_Resume.pdf"
+                  download="Kim_Joseph_Inoc_VA_Resume.pdf"
+                  className="interactive px-8 py-4 bg-white/5 text-text-primary font-bold rounded-full border border-white/10 hover:bg-white/10 transition-all transform hover:scale-105 active:scale-95 inline-flex items-center gap-3 text-base"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
+                  Download CV
+                </a>
+              </Magnetic>
             </div>
           </motion.div>
         </div>

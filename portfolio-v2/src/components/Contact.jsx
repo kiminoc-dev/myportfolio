@@ -1,8 +1,58 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Mail } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+  const [status, setStatus] = useState('idle'); // 'idle' | 'sending' | 'success' | 'error'
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('sending');
+    setErrorMessage('');
+
+    try {
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+      if (!serviceId || !templateId || !publicKey) {
+        throw new Error('EmailJS configuration is missing. Please check your .env file.');
+      }
+
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        },
+        publicKey
+      );
+
+      setStatus('success');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      console.error('EmailJS Error:', error);
+      setStatus('error');
+      setErrorMessage(error.text || 'Something went wrong. Please try again later.');
+    }
+  };
+
   return (
     <section id="contact" className="relative py-20 overflow-hidden">
       <div className="container mx-auto px-6">
@@ -61,22 +111,30 @@ const Contact = () => {
             transition={{ duration: 0.6 }}
             className="p-8 md:p-12 rounded-3xl bg-surface border border-white/10 shadow-2xl"
           >
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-text-secondary text-xs uppercase tracking-widest font-medium ml-1">Name</label>
                   <input
                     type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 text-text-primary focus:border-accent-blue outline-none transition-all"
-                    placeholder="John Doe"
+                    placeholder="Kim Inoc"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-text-secondary text-xs uppercase tracking-widest font-medium ml-1">Email</label>
                   <input
                     type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 text-text-primary focus:border-accent-blue outline-none transition-all"
-                    placeholder="john@example.com"
+                    placeholder="username@gmail.com"
                   />
                 </div>
               </div>
@@ -85,6 +143,10 @@ const Contact = () => {
                 <label className="text-text-secondary text-xs uppercase tracking-widest font-medium ml-1">Subject</label>
                 <input
                   type="text"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 text-text-primary focus:border-accent-blue outline-none transition-all"
                   placeholder="Systems Optimization"
                 />
@@ -93,18 +155,57 @@ const Contact = () => {
               <div className="space-y-2">
                 <label className="text-text-secondary text-xs uppercase tracking-widest font-medium ml-1">Message</label>
                 <textarea
+                  name="message"
                   rows="4"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 text-text-primary focus:border-accent-blue outline-none transition-all"
                   placeholder="Tell me about your project..."
                 />
               </div>
 
-              <button
-                type="submit"
-                className="interactive w-full py-4 bg-accent-blue text-white font-bold rounded-xl hover:bg-blue-600 transition-all transform hover:scale-[1.02] active:scale-95"
-              >
-                Send Message
-              </button>
+              <div className="relative">
+                <button
+                  type="submit"
+                  disabled={status === 'sending'}
+                  className="interactive w-full py-4 bg-accent-blue text-white font-bold rounded-xl hover:bg-blue-600 transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {status === 'sending' ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    'Send Message'
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {status === 'success' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute -top-16 left-0 right-0 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex items-center gap-2 justify-center"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      Message sent successfully!
+                    </motion.div>
+                  )}
+                  {status === 'error' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute -top-16 left-0 right-0 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2 justify-center"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {errorMessage}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </form>
           </motion.div>
         </div>
