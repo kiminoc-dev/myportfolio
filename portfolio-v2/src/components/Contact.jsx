@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import emailjs from '@emailjs/browser';
@@ -12,18 +12,6 @@ const Contact = () => {
   });
   const [status, setStatus] = useState('idle'); // 'idle' | 'sending' | 'success' | 'error'
   const [errorMessage, setErrorMessage] = useState('');
-  const recaptchaRef = useRef(null);
-
-  useEffect(() => {
-    if (window.grecaptcha && recaptchaRef.current) {
-      window.grecaptcha.render(recaptchaRef.current, {
-        'sitekey': import.meta.env.VITE_RECAPTCHA_SITE_KEY,
-        'callback': () => {
-          console.log('reCAPTCHA solved');
-        },
-      });
-    }
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -185,8 +173,8 @@ const Contact = () => {
 
               <div className="flex justify-center mb-4">
                 <div
-                  ref={recaptchaRef}
                   className="g-recaptcha"
+                  data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                 ></div>
               </div>
 
