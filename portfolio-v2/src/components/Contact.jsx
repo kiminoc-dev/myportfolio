@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import emailjs from '@emailjs/browser';
+import axios from 'axios';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +20,7 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('handleSubmit triggered');
     setStatus('sending');
     setErrorMessage('');
 
@@ -37,25 +38,28 @@ const Contact = () => {
         throw new Error('Please complete the reCAPTCHA verification.');
       }
 
-      await emailjs.send(
-        serviceId,
-        templateId,
+      await axios.post(
+        'https://api.emailjs.com/api/v1.0/email/send',
         {
-          from_name: formData.name,
-          from_email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          'g-recaptcha-response': captchaResponse,
-        },
-        publicKey
+          service_id: serviceId,
+          template_id: templateId,
+          user_id: publicKey,
+          template_params: {
+            from_name: formData.name,
+            from_email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+            'g-recaptcha-response': captchaResponse,
+          },
+        }
       );
 
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
-      console.error('EmailJS Error:', error);
+      console.error('EmailJS API Error:', error);
       setStatus('error');
-      setErrorMessage(error.text || 'Something went wrong. Please try again later.');
+      setErrorMessage(error.response?.data?.message || error.message || 'Something went wrong. Please try again later.');
     }
   };
 
