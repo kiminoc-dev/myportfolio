@@ -121,6 +121,30 @@ const Contact = () => {
             transition={{ duration: 0.6 }}
             className="p-8 md:p-12 rounded-3xl bg-surface border border-white/10 shadow-2xl"
           >
+            <AnimatePresence>
+              {status === 'success' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex items-center gap-2 justify-center"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Message sent successfully!
+                </motion.div>
+              )}
+              {status === 'error' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2 justify-center"
+                >
+                  <AlertCircle className="w-4 h-4" />
+                  {errorMessage}
+                </motion.div>
+              )}
+            </AnimatePresence>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -182,7 +206,7 @@ const Contact = () => {
                 ></div>
               </div>
 
-              <div className="relative">
+              <div className="">
                 <button
                   type="submit"
                   disabled={status === 'sending'}
@@ -197,31 +221,6 @@ const Contact = () => {
                     'Send Message'
                   )}
                 </button>
-
-                <AnimatePresence>
-                  {status === 'success' && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute -top-16 left-0 right-0 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex items-center gap-2 justify-center"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      Message sent successfully!
-                    </motion.div>
-                  )}
-                  {status === 'error' && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute -top-16 left-0 right-0 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2 justify-center"
-                    >
-                      <AlertCircle className="w-4 h-4" />
-                      {errorMessage}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
             </form>
           </motion.div>
