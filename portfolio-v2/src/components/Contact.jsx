@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 
 const Contact = () => {
@@ -40,6 +40,7 @@ const Contact = () => {
           from_email: formData.email,
           subject: formData.subject,
           message: formData.message,
+          'g-recaptcha-response': window.grecaptcha ? window.grecaptcha.getResponse() : '',
         },
         publicKey
       );
@@ -163,6 +164,13 @@ const Contact = () => {
                   className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 text-text-primary focus:border-accent-blue outline-none transition-all"
                   placeholder="Tell me about your project..."
                 />
+              </div >
+
+              <div className="flex justify-center mb-4">
+                <div
+                  className="g-recaptcha"
+                  data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                ></div>
               </div>
 
               <div className="relative">
